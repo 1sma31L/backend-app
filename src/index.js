@@ -4,10 +4,13 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
+
 const URI = process.env.MONGODB_URI;
+
 mongoose.connect(URI).then(() => {
 	console.log("Connected to MongoDB");
 });
+
 const app = express();
 const port = 3000;
 
