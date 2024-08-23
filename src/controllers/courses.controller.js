@@ -1,63 +1,60 @@
+import { FAIL, SUCCESS } from "../../utils/httpStatusText.js";
+import asyncWrapper from "../middleware/asyncWrapper.js";
 import Course from "../models/course.model.js";
 import { validationResult } from "express-validator";
+import AppError from "../../utils/appError.js";
 
-async function getCourses(req, res) {
-	const courses = await Course.find();
-	res.json(courses);
-}
+const getCourses = asyncWrapper(async (req, res) => {
+	const page = req.query.page || 1;
+	const limit = req.query.limit || 3;
+	const skip = (page - 1) * limit;
+	const courses = await Course.find({}, { __v: 0 }).limit(limit).skip(skip);
+	res.json({ status: "success", data: { courses } });
+});
 
-async function getCourse(req, res) {
-	try {
-		const course = await Course.findById(req.params.courseID);
-		if (!course) {
-			return res.status(404).json({ message: "Course not found", status: 404 });
-		}
-		return res.json(course);
-	} catch (error) {
-		return res.status(404).json({ message: "Course not found", status: 404 });
+const getCourse = asyncWrapper(async (req, res, next) => {
+	const course = await Course.findById(req.params.courseID);
+	if (!course) {
+		const error = AppError.create("Course not found", 404, FAIL);
+		return next(error);
 	}
-}
+	return res.json({ status: SUCCESS, data: { course } });
+});
 
-function createCourse(req, res) {
+const createCourse = asyncWrapper(async (req, res, next) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
-		return res.status(400).json({ errors: errors.array() });
+		const error = AppError.create(errors.array(), 400, FAIL);
+		return next(error);
 	}
 	const newCourse = new Course(req.body);
-	newCourse.save();
-	res.status(201).json(newCourse);
-}
+	await newCourse.save();
+	res.status(201).json({ status: "success", data: { course: newCourse } });
+});
 
-async function updateCourse(req, res) {
-	try {
-		const courseID = req.params.courseID;
-		const updatedCourse = await Course.updateOne(
-			{ _id: courseID },
-			{
-				$set: { ...req.body },
-			}
-		);
-		if (!updatedCourse.matchedCount) {
-			return res.status(404).json({ message: "Course not found", status: 404 });
+const updateCourse = asyncWrapper(async (req, res, next) => {
+	const courseID = req.params.courseID;
+	const updatedCourse = await Course.updateOne(
+		{ _id: courseID },
+		{
+			$set: { ...req.body },
 		}
-		res.status(201).json(await Course.findById(courseID));
-	} catch (error) {
-		res.status(404).json({ message: "Course not found", status: 404 });
+	);
+	if (!updatedCourse.matchedCount) {
+		const error = AppError.create("Course not found", 404, FAIL);
+		return next(error);
 	}
-}
+	res.status(201).json({ status: "success", data: { course: updatedCourse } });
+});
 
-async function deleteCourse(req, res) {
-	try {
-		const courseID = req.params.courseID;
-		const deletedCourse = await Course.deleteOne({ _id: courseID });
-		console.log(deletedCourse);
-		if (!deletedCourse.deletedCount) {
-			return res.status(404).json({ message: "Course not found", status: 404 });
-		}
-		res.status(204).json();
-	} catch (error) {
-		res.status(404).json({ message: "Course not found", status: 404 });
+const deleteCourse = asyncWrapper(async (req, res, next) => {
+	const courseID = req.params.courseID;
+	const deletedCourse = await Course.deleteOne({ _id: courseID });
+	if (!deletedCourse.deletedCount) {
+		const error = AppError.create("Course not found", 404, FAIL);
+		return next(error);
 	}
-}
+	res.status(204).json({ status: "success", data: null });
+});
 
 export { getCourses, getCourse, createCourse, updateCourse, deleteCourse };
