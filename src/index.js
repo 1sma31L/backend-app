@@ -18,7 +18,6 @@ app.use(cors());
 app.use([express.json()]);
 app.use("/api/courses", courseRouter);
 
-// 404 route handler
 app.all("*", (req, res) => {
 	res.status(404).json({
 		status: "fail",
@@ -26,7 +25,6 @@ app.all("*", (req, res) => {
 	});
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
 	res.status(err.statusCode || 500).json({
 		status: err.statusText || ERROR,

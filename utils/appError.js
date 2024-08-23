@@ -9,4 +9,5 @@ class AppError extends Error {
 		return this;
 	}
 }
+
 export default new AppError();
