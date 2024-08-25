@@ -1,14 +1,15 @@
 import express from "express";
 import courseRouter from "./routes/courses.route.js";
+import userRouter from "./routes/users.route.js";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import cors from "cors";
-import { ERROR, SUCCESS, FAIL } from "../utils/httpStatusText.js";
+import { ERROR, SUCCESS, FAIL } from "./utils/httpStatusText.js";
+import dotenv from "dotenv";
 dotenv.config();
 
 const URI = process.env.MONGODB_URI;
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 mongoose.connect(URI).then(() => {
 	console.log("Connected to MongoDB");
@@ -17,6 +18,7 @@ mongoose.connect(URI).then(() => {
 app.use(cors());
 app.use([express.json()]);
 app.use("/api/courses", courseRouter);
+app.use("/api/users", userRouter);
 
 app.all("*", (req, res) => {
 	res.status(404).json({
