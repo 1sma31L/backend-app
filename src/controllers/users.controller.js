@@ -19,7 +19,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 });
 
 const register = asyncWrapper(async (req, res, next) => {
-	const { firstName, lastName, email, password } = req.body;
+	const { firstName, lastName, email, password, role } = req.body;
 	if (await User.findOne({ email: email })) {
 		const error = appError.create("User already exists", 400, FAIL);
 		return next(error);
@@ -32,9 +32,15 @@ const register = asyncWrapper(async (req, res, next) => {
 		lastName,
 		email,
 		password: hashedPassword,
+		role,
+		avatar: req.file ? req.file.filename : "uploads/L.jpeg",
 	});
 
-	const token = await generateJWT({ email: newUser.email, id: newUser._id });
+	const token = await generateJWT({
+		email: newUser.email,
+		id: newUser._id,
+		role: newUser.role,
+	});
 	newUser.token = token;
 
 	await newUser.save();
@@ -54,10 +60,19 @@ const login = asyncWrapper(async (req, res, next) => {
 	const user = await User.findOne({ email: email });
 	const isMatch = user ? await bcrypt.compare(password, user.password) : false;
 	if (user && isMatch) {
-		const token = await generateJWT({ email: user.email, id: user._id });
+		const token = await generateJWT({
+			email: user.email,
+			id: user._id,
+			role: user.role,
+		});
 		return res
 			.status(200)
-			.json({ status: SUCCESS, data: "Logged in successfully", token: token });
+			.json({
+				status: SUCCESS,
+				data: "Logged in successfully",
+				token: token,
+				user: user,
+			});
 	} else {
 		const error = appError.create("Invalid credentials", 401, FAIL);
 		return next(error);
