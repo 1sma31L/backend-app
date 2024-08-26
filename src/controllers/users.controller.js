@@ -33,7 +33,7 @@ const register = asyncWrapper(async (req, res, next) => {
 		email,
 		password: hashedPassword,
 		role,
-		avatar: req.file ? req.file.filename : "uploads/L.jpeg",
+		avatar: req.file ? req.file.filename : "L.jpeg",
 	});
 
 	const token = await generateJWT({
@@ -65,14 +65,12 @@ const login = asyncWrapper(async (req, res, next) => {
 			id: user._id,
 			role: user.role,
 		});
-		return res
-			.status(200)
-			.json({
-				status: SUCCESS,
-				data: "Logged in successfully",
-				token: token,
-				user: user,
-			});
+		return res.status(200).json({
+			status: SUCCESS,
+			data: "Logged in successfully",
+			token: token,
+			user: user,
+		});
 	} else {
 		const error = appError.create("Invalid credentials", 401, FAIL);
 		return next(error);
