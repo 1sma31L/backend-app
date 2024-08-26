@@ -14,7 +14,7 @@ import allowedTo from "../middleware/allowedTo.js";
 const router = express.Router();
 router
 	.route("/")
-	.get(verifyToken, getCourses)
+	.get(getCourses)
 	.post(
 		validationShema(),
 		verifyToken,
