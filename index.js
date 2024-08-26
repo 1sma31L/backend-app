@@ -1,9 +1,9 @@
 import express from "express";
-import courseRouter from "./routes/courses.route.js";
-import userRouter from "./routes/users.route.js";
+import courseRouter from "./src/routes/courses.route.js";
+import userRouter from "./src/routes/users.route.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import { ERROR, SUCCESS, FAIL } from "./utils/httpStatusText.js";
+import { ERROR, SUCCESS, FAIL } from "./src/utils/httpStatusText.js";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
