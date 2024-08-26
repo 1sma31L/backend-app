@@ -1,5 +1,6 @@
 {
 	"scripts": {
+		"build": "node index.js",
 		"dev": "nodemon index.js"
 	},
 	"type": "module",
