@@ -35,7 +35,7 @@ const userShema = new mongoose.Schema({
 	},
 	avatar: {
 		type: String,
-		default: "L.jpeg",
+		default: "boy.jpg",
 	},
 });
 export default mongoose.model("User", userShema);

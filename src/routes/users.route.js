@@ -31,9 +31,11 @@ const upload = multer({
 router
 	.route("/")
 	.get(verifyToken, allowedTo(userRoles.ADMIN), usersController.getAllUsers);
+
 router
 	.route("/register")
 	.post(upload.single("avatar"), usersController.register);
+	
 router.route("/login").post(usersController.login);
 
 export default router;

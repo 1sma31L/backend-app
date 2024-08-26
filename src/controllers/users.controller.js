@@ -33,7 +33,7 @@ const register = asyncWrapper(async (req, res, next) => {
 		email,
 		password: hashedPassword,
 		role,
-		avatar: req.file ? req.file.filename : "L.jpeg",
+		avatar: req.file ? req.file.filename : "boy.jpg",
 	});
 
 	const token = await generateJWT({
